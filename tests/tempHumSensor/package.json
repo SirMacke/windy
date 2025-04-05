@@ -1,0 +1,22 @@
+{
+  "name": "@windy/tests/tempHumSensor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "scripts": {
+
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.6.5",
+  "dependencies": {
+    "coffee-script": "^1.12.7",
+    "i2c": "^0.2.5"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "i2c"
+    ]
+  }
+} 

@@ -1,11 +1,8 @@
 {
-  "name": "windy",
+  "name": "@windy/website",
   "version": "1.0.0",
-  "description": "Windy project monorepo",
-  "workspaces": [
-    "website",
-    "tests/*"
-  ],
+  "private": true,
+  "description": "Windy website",
   "scripts": {
     
   },
@@ -19,4 +16,4 @@
   "pnpm": {
     
   }
-}
+} 
