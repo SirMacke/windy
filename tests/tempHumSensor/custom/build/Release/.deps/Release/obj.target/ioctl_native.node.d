@@ -1,0 +1,1 @@
+cmd_Release/obj.target/ioctl_native.node := g++ -o Release/obj.target/ioctl_native.node -shared -pthread -rdynamic  -Wl,-soname=ioctl_native.node -Wl,--start-group Release/obj.target/ioctl_native/ioctl_native.o -Wl,--end-group 
