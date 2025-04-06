@@ -1,6 +1,12 @@
 # Windy
 A solar-powered Raspberry Pi Zero 2 weather station measuring wind direction, speed, temperature, and humidity with live web data.
 
+## Software
+- Telemetry script
+- Nuxt website
+- SQLite database
+- Tests
+
 ## Hardware
 ### Raspberry Pi Zero 2 W
 https://datasheets.raspberrypi.com/rpizero2/raspberry-pi-zero-2-w-product-brief.pdf

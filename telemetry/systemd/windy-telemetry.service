@@ -1,0 +1,18 @@
+[Unit]
+Description=Windy Weather Telemetry System
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/.venv/bin/python %h/windy/telemetry/index.py
+Restart=on-failure
+RestartSec=10
+User=%u
+WorkingDirectory=%h/windy/telemetry
+Environment="PYTHONUNBUFFERED=1"
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
