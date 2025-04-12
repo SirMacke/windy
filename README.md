@@ -21,6 +21,11 @@ Accuracy: +-3 %RH, +-0.5C
 
 ![AM2320 Temperature/Humidity Sensor Pinout](/images/image.png)
 
+### Joy-IT RB-ADC01 (Analog-Digital converter for raspberry pi)
+https://joy-it.net/en/products/RB-ADC01
+https://joy-it.net/files/files/Produkte/RB-ADC01/RB-ADC01_Datasheet_2021-08-13.pdf
+https://joy-it.net/files/files/Produkte/RB-ADC01/RB-ADC01_Manual_2024-04-09.pdf
+
 ## Setup
 1.
 2.
