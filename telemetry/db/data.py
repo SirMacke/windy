@@ -1,6 +1,3 @@
-import sqlite3
-from datetime import datetime
-
 def save_sensor_reading(conn, sensor_type, data):
     """
     Save sensor reading to the database

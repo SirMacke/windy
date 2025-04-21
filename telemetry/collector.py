@@ -1,13 +1,12 @@
 import time
 import os
-import sqlite3
 import importlib
 import logging
 from datetime import datetime
 import sys
 import requests  # Add for API submission option
 
-from config import DB_PATH, API_KEY, AM2320_BUS_NUMBER, AM2320_ADDRESS
+from config import DB_PATH, API_KEY, AM2320_BUS_NUMBER, AM2320_ADDRESS, WIND_SENSOR_ADDRESS
 from db.init import get_db_connection, initialize_db
 from db.data import save_sensor_reading
 
@@ -82,6 +81,8 @@ class SensorCollector:
         # Use configuration based on sensor type
         if sensor_type == 'AM2320':
             return sensor_class(bus_number=AM2320_BUS_NUMBER, address=AM2320_ADDRESS)
+        elif sensor_type == 'WindSensor':
+            return sensor_class(address=WIND_SENSOR_ADDRESS)
         
         # Default instantiation
         return sensor_class()
@@ -137,6 +138,26 @@ class SensorCollector:
                         data = {
                             'temperature': temperature,
                             'humidity': humidity
+                        }
+                        
+                        # Save to database directly or via API
+                        if self.use_api:
+                            self.save_data_via_api(sensor_type, data)
+                        else:
+                            save_sensor_reading(conn, sensor_type, data)
+                            logger.info(f"Saved reading: {data}")
+                    else:
+                        logger.warning(f"Failed to read data from {sensor_type}")
+                
+                elif sensor_type == 'WindSensor':
+                    wind_speed, wind_direction, speed_voltage, direction_voltage = sensor.read_data()
+                    
+                    if wind_speed is not None and wind_direction is not None:
+                        data = {
+                            'wind_speed': wind_speed,
+                            'wind_direction': wind_direction,
+                            'speed_voltage': speed_voltage,
+                            'direction_voltage': direction_voltage
                         }
                         
                         # Save to database directly or via API

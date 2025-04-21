@@ -1,3 +1,5 @@
 flask==2.3.3
 python-dotenv==1.0.0
-smbus2==0.4.2 
+smbus2==0.4.2
+adafruit-circuitpython-ads1x15==2.2.14
+adafruit-blinka==8.22.0 

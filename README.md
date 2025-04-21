@@ -26,6 +26,9 @@ https://joy-it.net/en/products/RB-ADC01
 https://joy-it.net/files/files/Produkte/RB-ADC01/RB-ADC01_Datasheet_2021-08-13.pdf
 https://joy-it.net/files/files/Produkte/RB-ADC01/RB-ADC01_Manual_2024-04-09.pdf
 
+### WS303U Wind sensor
+https://github.com/microrobotics/WS303U/blob/main/WS303U_datasheet.pdf
+
 ## Setup
 1.
 2.

@@ -31,7 +31,7 @@ Rn = 10000   # Reference resistance at Tn
 # Wind sensor scaling factors
 # Assuming 0-5V corresponds to 0-360 degrees for direction
 # and 0-5V corresponds to 0-100 m/s for speed (adjust these values based on your sensor specs)
-DIRECTION_SCALE = 360.0 / 4.0  # degrees per volt
+DIRECTION_SCALE = 360.0 / 4.1  # degrees per volt
 SPEED_SCALE = 100.0 / 4.0      # m/s per volt
 
 while True:
