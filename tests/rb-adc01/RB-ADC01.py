@@ -15,13 +15,27 @@ i2c = busio.I2C(board.SCL, board.SDA)
 ads = ADS.ADS1115(i2c)
 
 # Configure ADC for 5V range
-ads.gain = 1  # Set gain to 1 for ±4.096V range
+ads.gain = 2/3  # Set gain to 2/3 for ±6.144V range (16-bit ADC = 65536 steps over 12.288V total range)
+#ads.gain = 1  # Set gain to 1 for ±4.096V range (16-bit ADC = 65536 steps over 8.192V total range)
+                # This gives ~0.125mV resolution (8.192V/65536)a
+#ads.gain = 4
 ads.mode = Mode.SINGLE  # Single-shot mode
+#ads.mode = Mode.CONTINUOUS  # Continuous measurement mode for real-time wind monitoring
+
+
+# Create single-ended input for temperature
+#chan0 = AnalogIn(ads, ADS.P0)  # Temperature
 
 # Create single-ended input on channels
-chan0 = AnalogIn(ads, ADS.P0)  # Temperature
-chan1 = AnalogIn(ads, ADS.P1)  # Wind direction
-chan2 = AnalogIn(ads, ADS.P2)  # Wind speed
+#chan1 = AnalogIn(ads, ADS.P1)  # Wind direction
+#chan2 = AnalogIn(ads, ADS.P2)  # Wind speed
+
+# Create differential inputs for wind sensors
+# For wind direction, connect positive to P0 and negative to P1
+chan_dir = AnalogIn(ads, ADS.P0, ADS.P1)  # Wind direction (differential)
+
+# For wind speed, connect positive to P2 and negative to P3
+chan_speed = AnalogIn(ads, ADS.P2, ADS.P3)  # Wind speed (differential)
 
 # Temperature sensor constants
 Tn = 298.15  # Reference temperature in Kelvin (25°C)
@@ -29,31 +43,51 @@ B = 3980     # B-value of the NTC thermistor
 Rn = 10000   # Reference resistance at Tn
 
 # Wind sensor scaling factors
-# Assuming 0-5V corresponds to 0-360 degrees for direction
-# and 0-5V corresponds to 0-100 m/s for speed (adjust these values based on your sensor specs)
-DIRECTION_SCALE = 360.0 / 4.1  # degrees per volt
+# Adjust these values based on your sensor specifications
+DIRECTION_SCALE = 360.0 / 4.0  # degrees per volt
 SPEED_SCALE = 100.0 / 4.0      # m/s per volt
 
 while True:
     # Read temperature
-    ntc = chan0.voltage
-    Rt = (10000 / ntc) * (3.3 - ntc) - 10000
-    temp = (1 / ((1/Tn) + (1/B) * math.log(Rt / Rn))) - 273.15
+    #ntc = chan0.voltage
+    #Rt = (10000 / ntc) * (3.3 - ntc) - 10000
+    #temp = (1 / ((1/Tn) + (1/B) * math.log(Rt / Rn))) - 273.15
+    temp = 0
     
     # Read wind sensor voltages
-    direction_voltage = chan1.voltage
-    speed_voltage = chan2.voltage
+    #direction_voltage = chan1.voltage
+    #speed_voltage = chan2.voltage
+    direction_voltage = chan_dir.voltage
+    speed_voltage = chan_speed.voltage
     
     # Convert to actual values
-    wind_direction = direction_voltage * DIRECTION_SCALE
-    wind_speed = speed_voltage * SPEED_SCALE
+    #wind_direction = direction_voltage * DIRECTION_SCALE
+    #wind_speed = speed_voltage * SPEED_SCALE
+
+    # For differential readings, voltage could be negative
+    # Adjust the calculation based on your sensor's specifications
+    wind_direction = (direction_voltage + 4.0) * (360.0 / 8.0)  # Assuming -4V to +4V maps to 0-360°
+    if wind_direction < 0:
+        wind_direction += 360  # Handle negative values
+    if wind_direction >= 360:
+        wind_direction = wind_direction % 360  # Handle values over 360
     
-    print("Temperature: {:>5.1f}°C".format(temp))
-    print("Wind Direction: {:>5.1f}°".format(wind_direction))
-    print("Wind Speed: {:>5.1f} m/s".format(wind_speed))
-    print("Raw Voltages:")
-    print("  Temperature: {:>5.3f}V".format(ntc))
-    print("  Direction: {:>5.3f}V".format(direction_voltage))
-    print("  Speed: {:>5.3f}V".format(speed_voltage))
-    print("---------------------------------------------------")
+    # For differential speed readings
+    wind_speed = abs(speed_voltage) * SPEED_SCALE  # Use absolute value as speed is always positive
+    
+    print("Temp:      {:>5.1f}°C".format(temp))
+    print("Direction: {:>5.1f}° ({:>5.3f}V, raw: {:>5d})".format(wind_direction, direction_voltage, chan_dir.value))
+    print("Speed:     {:>5.1f}m/s ({:>5.3f}V, raw: {:>5d})".format(wind_speed, speed_voltage, chan_speed.value))
+    
+    # Determine voltage limit based on gain
+    if ads.gain == 1:
+        v_limit = 4.096
+    elif ads.gain == 2/3:
+        v_limit = 6.144
+    else:
+        v_limit = 4.096
+    
+    if any(v > (v_limit * 0.98) for v in [abs(direction_voltage), abs(speed_voltage)]):
+        print("WARNING: Near {:.3f}V limit!".format(v_limit))
+    print("-------------------")
     time.sleep(1)
