@@ -20,7 +20,7 @@ ads.gain = 2/3  # Set gain to 2/3 for ±6.144V range (16-bit ADC = 65536 steps o
                 # This gives ~0.125mV resolution (8.192V/65536)a
 #ads.gain = 4
 ads.mode = Mode.SINGLE  # Single-shot mode
-#ads.mode = Mode.CONTINUOUS  # Continuous measurement mode for real-time wind monitoring
+#ads.mode = Mode.CONTINUOUS  # Continuous measurement mode for real-time wind monitoring - does not work
 
 
 # Create single-ended input for temperature
@@ -44,7 +44,7 @@ Rn = 10000   # Reference resistance at Tn
 
 # Wind sensor scaling factors
 # Adjust these values based on your sensor specifications
-DIRECTION_SCALE = 360.0 / 4.0  # degrees per volt
+DIRECTION_SCALE = 360.0 / 5.0  # degrees per volt
 SPEED_SCALE = 100.0 / 4.0      # m/s per volt
 
 while True:
@@ -67,10 +67,13 @@ while True:
     # For differential readings, voltage could be negative
     # Adjust the calculation based on your sensor's specifications
     # Simple direction calculation - similar to speed calculation
-    wind_direction = (abs(direction_voltage) * DIRECTION_SCALE) % 360
+    # Offset by 0.046V (the reading when no wind) and scale appropriately
+    direction_offset = 0.047  # Voltage when no wind
+    wind_direction = min(360, max(0, (abs(direction_voltage) - direction_offset) * DIRECTION_SCALE))
     
     # For differential speed readings
-    wind_speed = abs(speed_voltage) * SPEED_SCALE  # Use absolute value as speed is always positive
+    speed_offset = 0.002  # Voltage when no wind
+    wind_speed = max(0, (abs(speed_voltage) - speed_offset) * SPEED_SCALE)  # Use absolute value as speed is always positive
     
     print("Temp:      {:>5.1f}°C".format(temp))
     print("Direction: {:>5.1f}° ({:>5.3f}V, raw: {:>5d})".format(wind_direction, direction_voltage, chan_dir.value))
