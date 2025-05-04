@@ -66,11 +66,8 @@ while True:
 
     # For differential readings, voltage could be negative
     # Adjust the calculation based on your sensor's specifications
-    wind_direction = (direction_voltage + 4.0) * (360.0 / 8.0)  # Assuming -4V to +4V maps to 0-360°
-    if wind_direction < 0:
-        wind_direction += 360  # Handle negative values
-    if wind_direction >= 360:
-        wind_direction = wind_direction % 360  # Handle values over 360
+    # Simple direction calculation - similar to speed calculation
+    wind_direction = (abs(direction_voltage) * DIRECTION_SCALE) % 360
     
     # For differential speed readings
     wind_speed = abs(speed_voltage) * SPEED_SCALE  # Use absolute value as speed is always positive
