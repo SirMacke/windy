@@ -12,7 +12,7 @@ import math
 i2c = busio.I2C(board.SCL, board.SDA)
 
 # Create the ADC object using the I2C bus
-ads = ADS.ADS1115(i2c)
+ads = ADS.ADS1115(i2c, address=0x48)
 
 # Configure ADC for 5V range
 ads.gain = 2/3  # Set gain to 2/3 for ±6.144V range (16-bit ADC = 65536 steps over 12.288V total range)
@@ -43,9 +43,8 @@ B = 3980     # B-value of the NTC thermistor
 Rn = 10000   # Reference resistance at Tn
 
 # Wind sensor scaling factors
-# Adjust these values based on your sensor specifications
-DIRECTION_SCALE = 360.0 / 5.0  # degrees per volt
-SPEED_SCALE = 100.0 / 4.0      # m/s per volt
+DIRECTION_SCALE = 360.0 / 5.0  # degrees per volt - accurate at wind from 180 & 260 degrees (72)
+SPEED_SCALE = 4*2     # m/s per volt - somewhat accurate - seems like 4 m/s/V for 0-10V model, 8 m/s/V for 0-5V model
 
 while True:
     # Read temperature
